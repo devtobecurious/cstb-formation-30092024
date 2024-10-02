@@ -1,6 +1,6 @@
 import { AsyncPipe, JsonPipe, UpperCasePipe } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { filter, finalize, map, Observable, Subscription, tap } from 'rxjs';
 import { TestOnePipe } from '../test-one.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -40,7 +40,14 @@ export class DiscoverObsComponent {// implements OnInit, OnDestroy {
     }, 1500);
 
     console.info('****')
-  })
+  }).pipe(
+    tap(item => console.info('observation', item)), // lecteur seule
+    filter(item => item.length <= 8),
+    tap(item => console.info('observation 2', item)), // lecteur seule
+    map(item => item.length),
+    map(item => item * 10),
+    finalize(() => console.info('fin !!!'))
+  )
 
 
   // singTitleSignal = toSignal(this.singTitle$)
