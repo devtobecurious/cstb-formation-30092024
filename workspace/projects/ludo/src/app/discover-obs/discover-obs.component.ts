@@ -1,47 +1,62 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AsyncPipe, JsonPipe, UpperCasePipe } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
+import { TestOnePipe } from '../test-one.pipe';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-discover-obs',
   standalone: true,
-  imports: [],
+  imports: [AsyncPipe, UpperCasePipe, JsonPipe, TestOnePipe],
   templateUrl: './discover-obs.component.html',
   styleUrl: './discover-obs.component.css'
 })
-export class DiscoverObsComponent implements OnInit, OnDestroy {
-  private containerOfsubscriptions = new Subscription()
+export class DiscoverObsComponent {// implements OnInit, OnDestroy {
+  movie = {
+    title: 'A new Hope'
+  }
+  //maPipe = inject(TestOnePipe)
+  // private containerOfsubscriptions = new Subscription()
+
+
 
   // COLD OBSERVABLE
   singTitle$ = new Observable<string>(subscriber => {
     console.info('-----')
-    const random = Math.random() * 100
 
+    const random = Math.random() * 100
     console.info('SYNC', random)
 
-    subscriber.next('COUCOU')
+    subscriber.next('Oh marie')
 
     setTimeout(() => {
       console.info('ASYNC', random)
       // subscriber.error('ooops error')
-      subscriber.next('COUCOU ASYNC')
-      subscriber.complete()
+      subscriber.next('Allumer le feu')
+      setTimeout(() => {
+        subscriber.next('Diego')
+        subscriber.complete()
+      }, 1500);
     }, 1500);
 
     console.info('****')
   })
 
-  ngOnInit(): void {
-    const sub$ = this.singTitle$.subscribe({
-      next: item => console.info('Oh un retour de l\'obs', item),
-      error: err => console.info(err),
-      complete: () => console.info('tout fini')
-    }) // les données à l'intérieur de chaque subscribe sont uniques !
-    // this.singTitle$.subscribe() // attention : chaque subscribe déclenche la fonction interne de l'observable
 
-    this.containerOfsubscriptions.add(sub$)
-  }
+  // singTitleSignal = toSignal(this.singTitle$)
 
-  ngOnDestroy(): void {
-    this.containerOfsubscriptions.unsubscribe()
-  }
+  // ngOnInit(): void {
+  //   const sub$ = this.singTitle$.subscribe({
+  //     next: item => console.info('Oh un retour de l\'obs', item),
+  //     error: err => console.info(err),
+  //     complete: () => console.info('tout fini')
+  //   }) // les données à l'intérieur de chaque subscribe sont uniques !
+  //   // this.singTitle$.subscribe() // attention : chaque subscribe déclenche la fonction interne de l'observable
+
+  //   this.containerOfsubscriptions.add(sub$)
+  // }
+
+  // ngOnDestroy(): void {
+  //   this.containerOfsubscriptions.unsubscribe()
+  // }
 }
